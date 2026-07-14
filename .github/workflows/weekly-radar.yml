@@ -52,16 +52,17 @@ jobs:
           path: output/*.md
           if-no-files-found: warn
 
-      - name: Commit updated snapshots
-        # Snapshots are the diff baseline. Committing them each week is what lets
-        # the tool detect "what changed since last run" over time.
+      - name: Commit updated snapshots and dashboard data
+        # Snapshots are the diff baseline (so the tool can detect "what changed
+        # since last run"); docs/data/*.json is what the public GitHub Pages
+        # dashboard reads. Both are committed back each run.
         run: |
           git config user.name  "legal-radar-bot"
           git config user.email "legal-radar-bot@users.noreply.github.com"
-          git add snapshots
+          git add snapshots docs/data
           if git diff --cached --quiet; then
-            echo "No snapshot changes to commit."
+            echo "No snapshot or dashboard changes to commit."
           else
-            git commit -m "chore: weekly snapshot update [skip ci]"
+            git commit -m "chore: weekly snapshot + dashboard update [skip ci]"
             git push
           fi

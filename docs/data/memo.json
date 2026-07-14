@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-07-14T18:55:50.753999+00:00",
+  "subject": "Infra Legal Radar: All quiet: no items need your attention this week",
+  "verdict": "All quiet: no items need your attention this week",
+  "severity": "quiet",
+  "watching": "Watching EC2 and S3 in us-east-1 and us-west-2",
+  "triage": {
+    "urgent": 0,
+    "review": 0,
+    "noise": 0,
+    "out_of_region": 2
+  },
+  "items": []
+}

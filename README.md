@@ -218,6 +218,36 @@ repository secrets (Settings → Secrets and variables → Actions):
 
 You can also trigger the workflow manually from the Actions tab.
 
+### Public dashboard (GitHub Pages)
+
+Every run also publishes two static JSON files — [`docs/data/memo.json`](docs/data)
+(the latest verdict + triage counts) and [`docs/data/events.json`](docs/data) (a
+rolling history of parsed AWS events) — which a single-page site in
+[`docs/index.html`](docs/index.html) reads to render:
+
+- the latest memo **verdict and triage counts** at the top, and
+- a **filterable table of recent events** — filter by date range, region,
+  availability zone, and AWS service, entirely **client-side** (no backend, no
+  API keys in the page). It's mobile-readable and includes a short explainer and
+  a link back to this repo.
+
+The site is served from the `docs/` folder via GitHub Pages. To enable it:
+**Settings → Pages → Build and deployment → Source: "Deploy from a branch" →
+Branch: `main`, folder: `/docs` → Save.** The scheduled workflow commits the
+refreshed JSON each run, so the dashboard stays current with no extra steps.
+
+> Note: the dashboard is **public** — it exposes the memo verdict and the parsed
+> public-AWS event data. That's only public AWS information plus the tool's
+> triage, never your contracts or credentials. GitHub Pages for a **private**
+> repo requires a paid plan; a public repo can serve Pages on any plan.
+
+Run it locally to preview the site before enabling Pages:
+
+```bash
+python main.py                       # regenerates docs/data/*.json
+python -m http.server -d docs 8099   # then open http://localhost:8099
+```
+
 ---
 
 ## For the technical reader
@@ -239,7 +269,12 @@ main.py
        sla_util.py      # claim-deadline date math
        findings.py      # bundle a detected item + SLA context for the model
        translate.py     # the rubric → Claude API → structured JSON
-       memo.py          # rank + render the Markdown memo
+       memo.py          # rank + render the Markdown memo (+ shared verdict/triage helpers)
+       mailer.py        # HTML email render + SMTP send
+       publish.py       # write docs/data/*.json for the dashboard
+  └─ docs/              # GitHub Pages site
+       index.html       # static single-page dashboard (client-side filters)
+       data/            # events.json + memo.json, refreshed each run
 ```
 
 **Pluggable sources.** Every source implements `fetch() -> FetchResult`. The

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infrastructure Legal Event Radar</title>
+<meta name="description" content="Automated legal triage of public AWS operational and SLA events, for infrastructure counsel.">
+<style>
+  :root {
+    --ink: #1b2430; --slate: #4a5568; --muted: #7a869a;
+    --line: #e4e8ee; --bg: #ffffff; --panel: #f8fafc; --accent: #24507a;
+    --urgent: #b00020; --urgent-bg: #fdecef;
+    --review: #9a6700; --review-bg: #fdf6e3;
+    --quiet: #1a7f37; --quiet-bg: #eaf6ee;
+    --info: #1f5fa8; --info-bg: #eaf1fa; --gray: #64748b; --gray-bg: #eef1f5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--ink); background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5; font-size: 15px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 64px; }
+  a { color: var(--accent); }
+
+  header.site { border-bottom: 1px solid var(--line); padding: 26px 0 20px; margin-bottom: 26px; }
+  header.site .wrap { padding-bottom: 0; }
+  .brand { font-family: Georgia, "Times New Roman", serif; font-size: 25px; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+  .tagline { color: var(--slate); margin: 6px 0 0; max-width: 70ch; }
+  .repo-link { font-size: 13px; margin-top: 10px; display: inline-block; }
+
+  /* Verdict banner */
+  .verdict-card { border: 1px solid var(--line); border-left-width: 5px; border-radius: 10px; padding: 18px 20px; background: var(--panel); }
+  .verdict-card.urgent { border-left-color: var(--urgent); background: var(--urgent-bg); }
+  .verdict-card.review { border-left-color: var(--review); background: var(--review-bg); }
+  .verdict-card.quiet  { border-left-color: var(--quiet);  background: var(--quiet-bg); }
+  .verdict-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+  .verdict-text { font-size: 22px; font-weight: 700; line-height: 1.3; margin: 4px 0 12px; }
+  .verdict-card.urgent .verdict-text { color: var(--urgent); }
+  .verdict-card.review .verdict-text { color: var(--review); }
+  .verdict-card.quiet  .verdict-text { color: var(--quiet); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .chip { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--slate); }
+  .chip.u { color: var(--urgent); border-color: #f3c6cf; }
+  .chip.r { color: var(--review); border-color: #eddcae; }
+  .meta { font-size: 12.5px; color: var(--muted); }
+
+  .items { margin: 18px 0 0; display: grid; gap: 10px; }
+  .item { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: #fff; }
+  .item .badge { font-size: 10.5px; }
+  .item h3 { margin: 6px 0 4px; font-size: 15px; }
+  .item .sub { font-size: 12.5px; color: var(--muted); }
+
+  h2.section { font-size: 15px; text-transform: uppercase; letter-spacing: .05em; color: var(--slate);
+    border-bottom: 1px solid var(--line); padding-bottom: 8px; margin: 38px 0 16px; }
+
+  /* Filters */
+  .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 14px; margin-bottom: 8px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .field input, .field select {
+    font: inherit; font-size: 14px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); width: 100%;
+  }
+  .filters-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 18px; flex-wrap: wrap; }
+  .count { font-size: 13px; color: var(--slate); }
+  button.reset { font: inherit; font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; color: var(--slate); }
+  button.reset:hover { background: var(--panel); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:hover { background: var(--panel); }
+  .az { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--slate); }
+  .region-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .region-name { color: var(--muted); font-size: 12px; }
+  .nowrap { white-space: nowrap; }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+  .badge.disruption { color: var(--urgent); background: var(--urgent-bg); }
+  .badge.degraded { color: var(--review); background: var(--review-bg); }
+  .badge.informational { color: var(--info); background: var(--info-bg); }
+  .badge.resolved { color: var(--quiet); background: var(--quiet-bg); }
+  .badge.unknown { color: var(--gray); background: var(--gray-bg); }
+  .badge.u { color: var(--urgent); background: var(--urgent-bg); }
+  .badge.r { color: var(--review); background: var(--review-bg); }
+
+  .empty { color: var(--muted); padding: 24px 0; text-align: center; font-style: italic; }
+
+  footer.site { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 18px; font-size: 11.5px; color: var(--muted); line-height: 1.55; }
+  footer.site a { color: var(--slate); }
+
+  /* Mobile: collapse the table into stacked cards */
+  @media (max-width: 680px) {
+    .verdict-text { font-size: 19px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { position: absolute; left: -9999px; }
+    tbody tr { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; padding: 6px 4px; }
+    tbody td { border: none; padding: 6px 12px; display: flex; justify-content: space-between; gap: 14px; }
+    tbody td::before { content: attr(data-label); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; flex: 0 0 auto; }
+    tbody td > * { text-align: right; }
+  }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <h1 class="brand">Infrastructure Legal Event Radar</h1>
+    <p class="tagline">Automated legal triage of public AWS operational and SLA data. It watches the AWS Health Dashboard, Service Terms, and SLA pages, then turns events and changes into an issue-spotting memo with deadlines — for infrastructure counsel.</p>
+    <a class="repo-link" id="repoLink" href="https://github.com/erinecrum/infra-legal-radar">View the project on GitHub →</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- Verdict banner -->
+  <div class="verdict-card quiet" id="verdictCard">
+    <div class="verdict-label">Latest memo</div>
+    <div class="verdict-text" id="verdictText">Loading…</div>
+    <div class="chips" id="chips"></div>
+    <div class="meta" id="verdictMeta"></div>
+  </div>
+  <div class="items" id="materialItems"></div>
+
+  <!-- Events -->
+  <h2 class="section">Recent AWS events</h2>
+  <div class="filters">
+    <div class="field"><label for="fFrom">From date</label><input type="date" id="fFrom"></div>
+    <div class="field"><label for="fTo">To date</label><input type="date" id="fTo"></div>
+    <div class="field"><label for="fRegion">Region</label><select id="fRegion"><option value="">All regions</option></select></div>
+    <div class="field"><label for="fAz">Availability zone</label><select id="fAz"><option value="">All AZs</option></select></div>
+    <div class="field"><label for="fService">AWS service</label>
+      <input id="fService" list="serviceList" placeholder="Any service" autocomplete="off">
+      <datalist id="serviceList"></datalist>
+    </div>
+    <div class="field"><label for="fSearch">Search</label><input id="fSearch" type="text" placeholder="Summary text…"></div>
+  </div>
+  <div class="filters-actions">
+    <span class="count" id="count"></span>
+    <button class="reset" id="reset">Reset filters</button>
+  </div>
+
+  <div id="tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Started</th><th>Region</th><th>AZ</th><th>Service</th><th>Status</th><th>Summary</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">No events match these filters.</div>
+  </div>
+
+  <footer class="site">
+    <p><strong>Not legal advice.</strong> This dashboard presents automated issue-spotting support based on public AWS data. It does not conclude legal or credit eligibility. Every item requires review by a qualified attorney against the applicable AWS agreements, DPAs, and invoices.</p>
+    <p id="footMeta"></p>
+    <p><a href="https://github.com/erinecrum/infra-legal-radar">Source &amp; documentation on GitHub</a></p>
+  </footer>
+</div>
+
+<script>
+const REPO = "https://github.com/erinecrum/infra-legal-radar";
+document.getElementById("repoLink").href = REPO;
+
+const el = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const datePart = s => (s || "").slice(0, 10);
+const fmtDate = s => { const d = datePart(s); if (!d) return "—"; const dt = new Date(d + "T00:00:00Z"); return isNaN(dt) ? d : dt.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric", timeZone:"UTC"}); };
+
+function statusClass(label) {
+  const l = (label || "").toLowerCase();
+  if (l.includes("disruption")) return "disruption";
+  if (l.includes("degraded")) return "degraded";
+  if (l.includes("informational")) return "informational";
+  if (l.includes("resolved") || l.includes("normally")) return "resolved";
+  return "unknown";
+}
+
+let EVENTS = [];
+
+function renderMemo(memo) {
+  const card = el("verdictCard");
+  const sev = memo.severity || "quiet";
+  card.className = "verdict-card " + sev;
+  el("verdictText").textContent = memo.verdict || "—";
+  const t = memo.triage || {};
+  const chips = el("chips");
+  chips.innerHTML = "";
+  const mk = (cls, label) => { const s = document.createElement("span"); s.className = "chip " + cls; s.textContent = label; chips.appendChild(s); };
+  mk("u", (t.urgent||0) + " URGENT");
+  mk("r", (t.review||0) + " REVIEW");
+  mk("", (t.noise||0) + " NOISE");
+  if (t.out_of_region) mk("", t.out_of_region + " out-of-region");
+  const gen = memo.generated_at ? new Date(memo.generated_at).toLocaleString(undefined, {timeZone:"UTC"}) + " UTC" : "";
+  el("verdictMeta").textContent = [memo.watching, gen ? "Updated " + gen : ""].filter(Boolean).join(" · ");
+
+  const wrap = el("materialItems");
+  wrap.innerHTML = "";
+  (memo.items || []).forEach(it => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const cls = it.materiality === "URGENT" ? "u" : "r";
+    div.innerHTML = `<span class="badge ${cls}">${esc(it.materiality)}</span>`
+      + `<h3>${esc(it.headline)}</h3>`
+      + `<div class="sub">${esc(it.source || "")}${it.region ? " · " + esc(it.region) : ""}${it.deadline ? " · " + esc(it.deadline) : ""}</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function uniqueSorted(vals) { return [...new Set(vals.filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
+
+function buildFilterOptions() {
+  const regions = uniqueSorted(EVENTS.map(e => e.region_code));
+  const regionSel = el("fRegion");
+  regions.forEach(rc => {
+    const e = EVENTS.find(x => x.region_code === rc);
+    const name = e && e.region_name && e.region_name !== rc ? ` (${e.region_name})` : "";
+    const o = document.createElement("option"); o.value = rc; o.textContent = rc + name; regionSel.appendChild(o);
+  });
+  const azs = uniqueSorted(EVENTS.flatMap(e => e.availability_zones || []));
+  const azSel = el("fAz");
+  azs.forEach(az => { const o = document.createElement("option"); o.value = az; o.textContent = az; azSel.appendChild(o); });
+
+  const services = uniqueSorted([
+    ...EVENTS.map(e => e.service_name),
+    ...EVENTS.flatMap(e => e.impacted_services || []),
+  ]);
+  const list = el("serviceList");
+  services.forEach(s => { const o = document.createElement("option"); o.value = s; list.appendChild(o); });
+}
+
+function eventMatchesService(e, svc) {
+  if (!svc) return true;
+  const s = svc.toLowerCase();
+  if ((e.service_name || "").toLowerCase() === s) return true;
+  return (e.impacted_services || []).some(x => (x || "").toLowerCase() === s);
+}
+
+function applyFilters() {
+  const from = el("fFrom").value, to = el("fTo").value;
+  const region = el("fRegion").value, az = el("fAz").value;
+  const svc = el("fService").value.trim();
+  const q = el("fSearch").value.trim().toLowerCase();
+
+  const filtered = EVENTS.filter(e => {
+    const d = datePart(e.started_at);
+    if (from && d && d < from) return false;
+    if (to && d && d > to) return false;
+    if (region && e.region_code !== region) return false;
+    if (az && !(e.availability_zones || []).includes(az)) return false;
+    if (!eventMatchesService(e, svc)) return false;
+    if (q && !(e.summary || "").toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const rows = el("rows");
+  rows.innerHTML = "";
+  filtered.forEach(e => {
+    const tr = document.createElement("tr");
+    const region = `<span class="region-code">${esc(e.region_code)}</span>`
+      + (e.region_name && e.region_name !== e.region_code ? `<br><span class="region-name">${esc(e.region_name)}</span>` : "");
+    const azs = (e.availability_zones && e.availability_zones.length)
+      ? `<span class="az">${e.availability_zones.map(esc).join(", ")}</span>` : "—";
+    const svcCell = esc(e.service_name || "—")
+      + (e.impacted_service_count > 1 ? `<br><span class="region-name">${e.impacted_service_count} services impacted</span>` : "");
+    const badge = `<span class="badge ${statusClass(e.status_label)}">${esc(e.status_label || "—")}</span>`;
+    const summary = e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.summary || "—")}</a>` : esc(e.summary || "—");
+    tr.innerHTML =
+      `<td data-label="Started" class="nowrap">${fmtDate(e.started_at)}</td>`
+      + `<td data-label="Region">${region}</td>`
+      + `<td data-label="AZ">${azs}</td>`
+      + `<td data-label="Service">${svcCell}</td>`
+      + `<td data-label="Status">${badge}</td>`
+      + `<td data-label="Summary">${summary}</td>`;
+    rows.appendChild(tr);
+  });
+  el("count").textContent = filtered.length + " of " + EVENTS.length + " event" + (EVENTS.length === 1 ? "" : "s");
+  el("empty").style.display = filtered.length ? "none" : "block";
+}
+
+function resetFilters() {
+  ["fFrom","fTo","fRegion","fAz","fService","fSearch"].forEach(id => el(id).value = "");
+  applyFilters();
+}
+
+async function load() {
+  try {
+    const [memo, events] = await Promise.all([
+      fetch("data/memo.json").then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch("data/events.json").then(r => r.ok ? r.json() : []).catch(() => []),
+    ]);
+    if (memo) renderMemo(memo);
+    else { el("verdictText").textContent = "No memo published yet."; }
+    EVENTS = Array.isArray(events) ? events : [];
+    el("footMeta").textContent = "Data is regenerated by a scheduled GitHub Actions run. Currently tracking " + EVENTS.length + " event(s).";
+    buildFilterOptions();
+    ["fFrom","fTo","fRegion","fAz","fService","fSearch"].forEach(id => {
+      el(id).addEventListener("input", applyFilters);
+      el(id).addEventListener("change", applyFilters);
+    });
+    el("reset").addEventListener("click", resetFilters);
+    applyFilters();
+  } catch (err) {
+    el("verdictText").textContent = "Could not load dashboard data.";
+    console.error(err);
+  }
+}
+load();
+</script>
+</body>
+</html>

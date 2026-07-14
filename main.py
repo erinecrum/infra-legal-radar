@@ -110,6 +110,7 @@ def main(argv=None) -> int:
     print("\nDetection pass:")
     findings = []
     out_of_region_events = []  # appendix-mode events, rendered as a table
+    all_health_events = []  # every parsed event (unfiltered) — for the dashboard
     # Structured run summary for the memo (collapsed when nothing changed).
     detection = {"unchanged": [], "changed_notes": [], "failures": [], "health": None}
     failures = 0
@@ -169,6 +170,7 @@ def main(argv=None) -> int:
 
         # --- event-feed source (Health) ---
         if result.items:
+            all_health_events = result.items  # unfiltered, for the public dashboard
             old_items = previous.items if previous else None
             d = diff_items(old_items, result.items, revision_key="revision")
             new_ids = {e.get("id") for e in d.new_items}
@@ -286,6 +288,12 @@ def main(argv=None) -> int:
     print(f"\nMemo written: {path}")
     print(f"  Triage: {urgent} URGENT · {review} REVIEW · {noise} NOISE")
 
+    # --- Publish dashboard data (docs/data/*.json for GitHub Pages) ---
+    _publish_dashboard(
+        args, items, all_health_events, out_of_region_events,
+        watchlist, run_time, (urgent, review, noise),
+    )
+
     # --- Email delivery ---
     _maybe_send_email(
         args,
@@ -299,6 +307,63 @@ def main(argv=None) -> int:
     )
 
     return 1 if failures else 0
+
+
+def _publish_dashboard(
+    args, items, all_health_events, out_of_region_events, watchlist, run_time, counts
+) -> None:
+    """Write docs/data/{events,memo}.json for the static site. Non-fatal."""
+    from radar.memo import build_verdict, human_watchlist, item_deadline
+    from radar.publish import publish_dashboard
+
+    urgent, review, noise = counts
+    verdict, severity = build_verdict(items)
+
+    material = [
+        it for it in items
+        if it.get("memo", {}).get("materiality") in ("URGENT", "REVIEW")
+    ]
+    memo_items = []
+    for it in material:
+        m = it["memo"]
+        ev = (it.get("payload") or {}).get("event") or {}
+        memo_items.append({
+            "headline": m.get("headline", ""),
+            "materiality": m.get("materiality", ""),
+            "type": m.get("classification", ""),
+            "source": it.get("source_name", ""),
+            "deadline": item_deadline(it),
+            "region": ev.get("region_code", ""),
+        })
+
+    memo_json = {
+        "generated_at": run_time.astimezone(timezone.utc).isoformat(),
+        "subject": f"Infra Legal Radar: {verdict}",
+        "verdict": verdict,
+        "severity": severity,
+        "watching": human_watchlist(watchlist),
+        "triage": {
+            "urgent": urgent,
+            "review": review,
+            "noise": noise,
+            "out_of_region": len(out_of_region_events),
+        },
+        "items": memo_items,
+    }
+
+    try:
+        result = publish_dashboard(
+            "docs",
+            events=all_health_events,
+            memo_json=memo_json,
+            run_time=run_time,
+        )
+        print(
+            f"Dashboard: published {result['events_published']} event(s) "
+            f"to {result['path']}/"
+        )
+    except Exception as exc:
+        print(f"Dashboard: FAILED to publish — {exc}")
 
 
 def _maybe_send_email(

@@ -136,6 +136,13 @@ def build_verdict(items: List[Dict[str, Any]]) -> Tuple[str, str]:
     return (f"{head}: {detail}" if detail else head, severity)
 
 
+def item_deadline(item: Dict[str, Any]) -> Optional[str]:
+    """Human-phrased earliest deadline for a single item (for dashboard/JSON)."""
+    if "memo" not in item:
+        return None
+    return _earliest_deadline_phrase([item])
+
+
 def appendix_rows(events: List[Dict[str, Any]]) -> List[Tuple[str, str, str, str]]:
     """(region, event type, start date, status) per out-of-region event."""
     rows = []
