@@ -5,3 +5,5 @@ feedparser>=6.0       # RSS/Atom parsing for the AWS Health event feed
 PyYAML>=6.0           # optional non-confidential watchlist config
 python-dotenv>=1.0    # load ANTHROPIC_API_KEY from a local .env (never committed)
 anthropic>=0.40       # Claude API client for the translation layer
+Markdown>=3.5         # render the memo Markdown to HTML for the email body
+

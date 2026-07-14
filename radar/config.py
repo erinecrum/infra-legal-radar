@@ -8,9 +8,10 @@ is absent; the detection layer must work with zero configuration.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import yaml
 
@@ -98,4 +99,68 @@ def load_watchlist(path: str | Path = "config.yaml") -> Watchlist:
         regions_used=_as_str_list(data.get("regions_used")),
         heightened_concerns=_as_str_list(data.get("heightened_concerns")),
         region_filter_mode=mode,
+    )
+
+
+@dataclass
+class EmailConfig:
+    """Settings for emailing the memo.
+
+    Split by sensitivity: the recipient and SMTP host/port are non-secret and
+    live in config.yaml (so the scheduled GitHub Actions run gets them for free);
+    the SMTP username and app password are secrets and come only from the
+    environment (.env locally, Actions secrets in CI) — never from committed
+    files.
+    """
+
+    to: str = ""
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    username: str = ""  # from env SMTP_USERNAME (also the From address)
+    password: str = ""  # from env SMTP_APP_PASSWORD
+
+    @property
+    def from_addr(self) -> str:
+        return self.username or self.to
+
+    @property
+    def is_enabled(self) -> bool:
+        """A send should be attempted only when a recipient is configured."""
+        return bool(self.to)
+
+    def missing_credentials(self) -> List[str]:
+        """Which required secrets are absent (for a clear error message)."""
+        missing = []
+        if not self.username:
+            missing.append("SMTP_USERNAME")
+        if not self.password:
+            missing.append("SMTP_APP_PASSWORD")
+        return missing
+
+
+def load_email_config(path: str | Path = "config.yaml") -> EmailConfig:
+    """Recipient + SMTP host/port from YAML; credentials from the environment.
+
+    Gmail app passwords are often displayed with spaces (e.g. "abcd efgh ijkl
+    mnop"); we strip whitespace so pasting either form works."""
+    data = {}
+    p = Path(path)
+    if p.exists():
+        with p.open("r", encoding="utf-8") as fh:
+            loaded = yaml.safe_load(fh) or {}
+        if isinstance(loaded, dict):
+            data = loaded
+
+    try:
+        port = int(data.get("smtp_port", 587))
+    except (TypeError, ValueError):
+        port = 587
+
+    password = os.environ.get("SMTP_APP_PASSWORD", "")
+    return EmailConfig(
+        to=str(data.get("email_to", "") or "").strip(),
+        smtp_host=str(data.get("smtp_host", "smtp.gmail.com") or "smtp.gmail.com").strip(),
+        smtp_port=port,
+        username=os.environ.get("SMTP_USERNAME", "").strip(),
+        password="".join(password.split()),  # tolerate app passwords with spaces
     )

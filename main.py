@@ -31,7 +31,7 @@ warnings.filterwarnings("ignore", message=r"urllib3 v2 only supports OpenSSL")
 
 from dotenv import load_dotenv
 
-from radar.config import load_watchlist
+from radar.config import load_email_config, load_watchlist
 from radar.diff import diff_items, diff_text, focused_excerpt
 from radar.findings import (
     change_finding,
@@ -87,6 +87,9 @@ def main(argv=None) -> int:
     parser.add_argument("--output", default="output", help="memo output dir")
     parser.add_argument(
         "--detect-only", action="store_true", help="skip the Claude translation/memo"
+    )
+    parser.add_argument(
+        "--no-email", action="store_true", help="generate the memo but do not email it"
     )
     args = parser.parse_args(argv)
 
@@ -273,7 +276,41 @@ def main(argv=None) -> int:
     noise = sum(1 for it in items if it.get("memo", {}).get("materiality") == "NOISE")
     print(f"\nMemo written: {path}")
     print(f"  Triage: {urgent} URGENT · {review} REVIEW · {noise} NOISE")
+
+    # --- Email delivery ---
+    _maybe_send_email(args, items, memo_text, out_of_region_events, path)
+
     return 1 if failures else 0
+
+
+def _maybe_send_email(args, items, memo_text, out_of_region_events, memo_path) -> None:
+    """Send the memo by email if a recipient is configured. A send failure is
+    reported but never fails the run — the memo is already written/artifacted."""
+    from radar.mailer import build_subject, send_memo_email  # lazy: needs `markdown`
+
+    email_cfg = load_email_config(args.config)
+
+    if args.no_email:
+        print("\nEmail: skipped (--no-email).")
+        return
+    if not email_cfg.is_enabled:
+        print(
+            "\nEmail: no recipient configured (set `email_to` in config.yaml to enable)."
+        )
+        return
+
+    subject = build_subject(items, out_of_region_events)
+    try:
+        send_memo_email(
+            email_cfg,
+            subject=subject,
+            memo_markdown=memo_text,
+            attachment_name=memo_path.name,
+        )
+        print(f"\nEmail: sent to {email_cfg.to} — subject: \"{subject}\"")
+    except Exception as exc:
+        print(f"\nEmail: FAILED to send — {exc}")
+        print("  (The memo was still generated and saved.)")
 
 
 if __name__ == "__main__":

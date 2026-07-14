@@ -32,3 +32,12 @@ region_filter_mode: appendix
 heightened_concerns:
   - data_residency
   - gpu_capacity
+
+# --- Email delivery (optional) ---
+# After each run the memo is emailed here (HTML body + Markdown attachment).
+# Leave email_to blank to disable sending entirely.
+# The SMTP username and app password are secrets and live in .env / GitHub
+# Actions secrets (SMTP_USERNAME, SMTP_APP_PASSWORD) — never in this file.
+email_to: erinecrum@gmail.com
+smtp_host: smtp.gmail.com   # Gmail default; change for another provider
+smtp_port: 587              # STARTTLS

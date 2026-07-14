@@ -38,6 +38,11 @@ jobs:
       - name: Run the radar
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Email credentials (optional). Add these as repository secrets to
+          # enable the scheduled email. If unset, the run still succeeds and just
+          # skips sending. Recipient/host/port come from config.yaml.
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
         run: python main.py
 
       - name: Upload memo as build artifact

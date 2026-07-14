@@ -167,14 +167,56 @@ appendix; in `strict` mode it is dropped. A disruption in `us-east-1`, or a
 global event, is analyzed in full. An SLA credit-percentage change is analyzed
 in full either way.
 
+### Email delivery (optional)
+
+After each run, the tool can email you the memo — rendered as HTML in the body,
+with the Markdown file attached. The subject line summarizes the triage counts,
+e.g. `Infra Legal Radar: 1 URGENT, 3 REVIEW`, or `Infra Legal Radar: all quiet`
+when nothing material was found. Sending uses Gmail over SMTP (Python standard
+library — no extra service), and works identically for local and scheduled runs.
+
+**One-time Gmail setup:**
+
+1. Enable **2-Step Verification** on your Google account (required for app
+   passwords): https://myaccount.google.com/security
+2. Generate a **16-character app password**:
+   https://myaccount.google.com/apppasswords (name it e.g. "legal-radar").
+3. Put the credentials in `.env` (gitignored — never committed):
+   ```
+   SMTP_USERNAME=your_address@gmail.com
+   SMTP_APP_PASSWORD=abcd efgh ijkl mnop
+   ```
+   (Spaces in the app password are fine.)
+4. Set the recipient in `config.yaml` (this is a config value, not a secret):
+   ```yaml
+   email_to: your_address@gmail.com
+   smtp_host: smtp.gmail.com   # default; change for another provider
+   smtp_port: 587
+   ```
+
+That's it — the next `python main.py` will send the memo. To disable sending for
+a single run, use `--no-email`; to disable it entirely, leave `email_to` blank.
+If the credentials are missing or wrong, the run still completes and saves the
+memo — it just reports that the email failed.
+
+**Using a non-Gmail provider:** set `smtp_host`/`smtp_port` to your provider's
+STARTTLS SMTP endpoint and put your username/password in the same two `.env`
+variables. The send path is standard SMTP.
+
 ### Weekly automation (GitHub Actions)
 
 The workflow at [`.github/workflows/weekly-radar.yml`](.github/workflows/weekly-radar.yml)
 runs the tool every Monday, commits updated snapshots back to the repo (the diff
-baseline), and saves the memo as a downloadable build artifact. To enable it,
-add your key once as a repository secret named `ANTHROPIC_API_KEY`
-(Settings → Secrets and variables → Actions). You can also trigger it manually
-from the Actions tab.
+baseline), and saves the memo as a downloadable build artifact. Add these
+repository secrets (Settings → Secrets and variables → Actions):
+
+- `ANTHROPIC_API_KEY` — required, for the translation layer.
+- `SMTP_USERNAME` and `SMTP_APP_PASSWORD` — optional; add them to enable the
+  scheduled email (same values as your local `.env`). Without them the run still
+  succeeds and just skips sending. The recipient comes from `email_to` in the
+  committed `config.yaml`, so it needs no secret.
+
+You can also trigger the workflow manually from the Actions tab.
 
 ---
 
