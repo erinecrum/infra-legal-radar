@@ -80,13 +80,16 @@ and caveats honestly.
 
 A real memo produced from live data is checked in at
 [`docs/sample-memo.md`](docs/sample-memo.md) (freshly generated memos land in the
-gitignored `output/` folder).
-It triages two ongoing regional outages: screening EC2/S3 credit eligibility
-with a computed claim deadline, flagging the AWS "conflict damage" framing as a
-likely **force majeure** defense to credit claims, raising data-residency
-exposure from AWS's directive to migrate out of region, and — because the
-affected regions are not on the example watchlist — telling counsel to confirm
-footprint before escalating. That is the intended level of triage.
+gitignored `output/` folder). It was generated with the affected regions on the
+watchlist so the events are analyzed in full. It triages two ongoing regional
+outages: screening EC2/S3 credit eligibility with a computed claim deadline,
+flagging the AWS "conflict damage" framing as a likely **force majeure** defense
+to credit claims, and raising data-residency exposure from AWS's directive to
+migrate out of region. That is the intended level of triage.
+
+(With the default `config.yaml` — which lists `us-east-1` and `us-west-2` — those
+same Middle East events are *out of region*, so they would instead appear as
+one-line entries in the memo's NOISE appendix. See Region filtering below.)
 
 ---
 
@@ -125,13 +128,44 @@ summary prints the triage counts.
 All fields optional, nothing confidential:
 
 ```yaml
-aws_services_used: [EC2, S3]          # prioritize SLA screening for these
-regions_used: [us-east-1, eu-west-1]  # prioritize events in these regions
+aws_services_used: [EC2, S3]            # prioritize SLA screening for these
+regions_used: [us-east-1, us-west-2]    # FILTER operational events by region
+region_filter_mode: appendix            # appendix (default) | strict
 heightened_concerns: [data_residency, gpu_capacity]
 ```
 
-If present, the translation layer weights relevance toward what you run. If
-absent, it reports on everything.
+If `aws_services_used` / `heightened_concerns` are present, the translation
+layer weights relevance toward what you run. If the whole file is absent, the
+tool reports on everything.
+
+#### Region filtering (operational events only)
+
+`regions_used` is a **filter** on operational events from the AWS Health feed —
+not just a priority hint. When it is set:
+
+- Events affecting a **listed region** are reported in full.
+- **Global or region-less events are always in scope** and are never filtered
+  out — a global disruption can affect workloads anywhere.
+- Events affecting a region **not** on your list are handled per
+  `region_filter_mode`:
+  - **`appendix`** (default) — demoted to a single-line entry in the memo's
+    NOISE appendix (listed for awareness, not analyzed, and no API call spent
+    on them).
+  - **`strict`** — excluded from the memo entirely.
+
+Leave `regions_used` empty (or omit it) to disable region filtering and report
+operational events from every region.
+
+**Terms and SLA page changes are never region-filtered.** They are not
+region-specific — a changed liability cap or credit percentage applies to your
+account regardless of where you run — so they always appear in the main memo no
+matter what `regions_used` or `region_filter_mode` say.
+
+Worked example: with the config above, a disruption in `me-central-1` (UAE) is
+not on your list, so in `appendix` mode it shows up only as a one-liner in the
+appendix; in `strict` mode it is dropped. A disruption in `us-east-1`, or a
+global event, is analyzed in full. An SLA credit-percentage change is analyzed
+in full either way.
 
 ### Weekly automation (GitHub Actions)
 

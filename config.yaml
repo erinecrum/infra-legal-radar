@@ -13,10 +13,19 @@ aws_services_used:
   - EC2
   - S3
 
-# Regions you operate in (used to prioritize operational/health events).
+# Regions you operate in. This is a FILTER on operational (Health feed) events:
+# when set, only events affecting these regions are reported in full. Global or
+# multi-region events are always in scope. Terms and SLA changes are never
+# filtered by region. Leave empty to report events from every region.
 regions_used:
   - us-east-1
-  - eu-west-1
+  - us-west-2
+
+# What to do with operational events OUTSIDE regions_used:
+#   appendix (default) — show them as one-line entries in the NOISE appendix
+#   strict             — exclude them entirely
+# Has no effect when regions_used is empty.
+region_filter_mode: appendix
 
 # Free-form flags that raise the priority of matching events/changes.
 # Suggested flags: data_residency, hipaa, fedramp, gpu_capacity, ai_ml_terms

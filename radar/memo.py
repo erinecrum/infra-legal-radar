@@ -96,13 +96,30 @@ def _render_error(item: Dict[str, Any], n: int) -> List[str]:
     ]
 
 
+def _one_line_event(e: Dict[str, Any]) -> str:
+    """Terse single-line entry for an out-of-region operational event."""
+    region = e.get("region_code", "?")
+    name = e.get("region_name", "")
+    loc = f"{region} / {name}" if name and name != region else region
+    started = (e.get("started_at", "") or "")[:10]
+    return (
+        f"- **[out of region: {loc}]** {e.get('summary', '')} — "
+        f"{e.get('service_name', '')} — {e.get('status_label', '')}, "
+        f"started {started}, {e.get('impacted_service_count', 0)} service(s), "
+        f"{e.get('update_count', 0)} update(s). "
+        f"_(Not analyzed — outside watchlist regions.)_"
+    )
+
+
 def render_memo(
     items: List[Dict[str, Any]],
     *,
     run_time: datetime,
     watchlist_summary: str,
     detection_notes: List[str],
+    out_of_region_events: List[Dict[str, Any]] = None,
 ) -> str:
+    out_of_region_events = out_of_region_events or []
     good = [it for it in items if "memo" in it]
     failed = [it for it in items if "memo" not in it]
 
@@ -126,10 +143,15 @@ def render_memo(
         f"**Triage:** {len(urgent)} URGENT · {len(review)} REVIEW · "
         f"{len(noise)} NOISE"
         + (f" · {len(failed)} translation error(s)" if failed else "")
+        + (
+            f" · {len(out_of_region_events)} out-of-region (appendix)"
+            if out_of_region_events
+            else ""
+        )
     )
     out.append("")
 
-    if not good and not failed:
+    if not good and not failed and not out_of_region_events:
         out.append(
             "_No material events or changes detected this run. Detection ran "
             "cleanly against all sources (see run notes below)._"
@@ -156,14 +178,27 @@ def render_memo(
             out += _render_error(it, n)
             n += 1
 
-    if noise:
+    if noise or out_of_region_events:
         out.append("---")
         out.append("")
-        out.append("## Appendix — NOISE (non-material changes)")
+        out.append("## Appendix — NOISE / de-emphasized")
         out.append("")
         for it in noise:
             out += _render_item(it, n)
             n += 1
+        if out_of_region_events:
+            out.append(
+                "### Out-of-region operational events (not analyzed)"
+            )
+            out.append("")
+            out.append(
+                "_These events affect AWS regions not on your watchlist. Listed "
+                "for awareness only; confirm you have no footprint there._"
+            )
+            out.append("")
+            for e in out_of_region_events:
+                out.append(_one_line_event(e))
+            out.append("")
 
     # Run notes: what detection did, for auditability.
     out.append("---")

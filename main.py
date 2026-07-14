@@ -70,9 +70,12 @@ def _print_event(e) -> None:
 def _watchlist_summary(w) -> str:
     if w.is_empty:
         return "none (reporting on everything)"
+    region_part = f"regions={w.regions_used or '—'}"
+    if w.regions_used:
+        region_part += f" (filter: {w.region_filter_mode})"
     return (
         f"services={w.aws_services_used or '—'}; "
-        f"regions={w.regions_used or '—'}; "
+        f"{region_part}; "
         f"concerns={w.heightened_concerns or '—'}"
     )
 
@@ -99,6 +102,7 @@ def main(argv=None) -> int:
     print("\nDetection pass:")
     findings = []
     notes = []
+    out_of_region_events = []  # appendix-mode events, rendered as one-liners
     failures = 0
 
     for source in active_sources():
@@ -171,10 +175,24 @@ def main(argv=None) -> int:
             )
 
             # Report every currently-open event (active exposure persists each
-            # run), plus any newly new/updated event, deduped by id.
+            # run), plus any newly new/updated event, deduped by id. Apply the
+            # region filter here (operational events only — never terms/SLA).
+            in_scope = excluded = appendixed = 0
             for e in result.items:
                 if e.get("resolved"):
                     continue
+                status = watchlist.region_status(
+                    e.get("region_code", ""), e.get("region_name", "")
+                )
+                if status == "out_of_scope":
+                    if watchlist.region_filter_mode == "strict":
+                        excluded += 1
+                        continue  # excluded entirely
+                    # appendix mode: one-line NOISE-appendix entry, not translated
+                    appendixed += 1
+                    out_of_region_events.append(e)
+                    continue
+
                 eid = e.get("id")
                 if eid in new_ids:
                     kind = "new"
@@ -182,6 +200,7 @@ def main(argv=None) -> int:
                     kind = "updated"
                 else:
                     kind = "ongoing"
+                in_scope += 1
                 _print_event(e)
                 findings.append(
                     operational_event_finding(
@@ -190,6 +209,22 @@ def main(argv=None) -> int:
                         change_kind=kind,
                         sla_data=sla_data,
                         watchlist=watchlist,
+                    )
+                )
+
+            if watchlist.regions_used and (excluded or appendixed):
+                mode = watchlist.region_filter_mode
+                print(
+                    f"    region filter ({mode}): {in_scope} in-scope, "
+                    + (f"{excluded} excluded" if excluded else f"{appendixed} → appendix")
+                )
+                notes.append(
+                    f"{source.name}: region filter [{mode}] on {watchlist.regions_used} — "
+                    f"{in_scope} in-scope; "
+                    + (
+                        f"{excluded} out-of-region event(s) excluded."
+                        if mode == "strict"
+                        else f"{appendixed} out-of-region event(s) demoted to appendix."
                     )
                 )
 
@@ -228,6 +263,7 @@ def main(argv=None) -> int:
         run_time=run_time,
         watchlist_summary=_watchlist_summary(watchlist),
         detection_notes=notes,
+        out_of_region_events=out_of_region_events,
     )
     path = write_memo(memo_text, run_time, args.output)
 
