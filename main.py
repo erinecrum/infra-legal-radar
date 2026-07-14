@@ -38,7 +38,7 @@ from radar.findings import (
     load_tracked_sla,
     operational_event_finding,
 )
-from radar.memo import render_memo, write_memo
+from radar.memo import render_markdown, write_memo
 from radar.registry import active_sources
 from radar.snapshot import SnapshotStore
 
@@ -50,6 +50,11 @@ _MAX_CHANGE_FINDINGS_PER_SOURCE = 12
 def _clip(s: str, n: int = 200) -> str:
     s = s.replace("\n", " ")
     return s if len(s) <= n else s[:n] + " …"
+
+
+def _short(name: str) -> str:
+    """Display name for run notes: drop the redundant leading 'AWS '."""
+    return name[4:] if name.startswith("AWS ") else name
 
 
 def _print_event(e) -> None:
@@ -104,8 +109,9 @@ def main(argv=None) -> int:
 
     print("\nDetection pass:")
     findings = []
-    notes = []
-    out_of_region_events = []  # appendix-mode events, rendered as one-liners
+    out_of_region_events = []  # appendix-mode events, rendered as a table
+    # Structured run summary for the memo (collapsed when nothing changed).
+    detection = {"unchanged": [], "changed_notes": [], "failures": [], "health": None}
     failures = 0
 
     for source in active_sources():
@@ -114,7 +120,7 @@ def main(argv=None) -> int:
         except Exception as exc:  # one bad source ≠ dead run
             failures += 1
             print(f"  [{source.name}] FETCH FAILED: {exc}")
-            notes.append(f"{source.name}: FETCH FAILED — {exc}")
+            detection["failures"].append(f"{_short(source.name)}: fetch failed — {exc}")
             continue
 
         previous = store.latest(source.source_id)
@@ -125,17 +131,17 @@ def main(argv=None) -> int:
             d = diff_text(previous.text if previous else None, result.text)
             if d.is_first_run:
                 print(f"  [{source.name}] baseline snapshot created (first run).")
-                notes.append(f"{source.name}: baseline snapshot created (no diff this run).")
+                detection["unchanged"].append(_short(source.name))
             elif not d.has_changes:
                 print(f"  [{source.name}] no change since last snapshot.")
-                notes.append(f"{source.name}: no change.")
+                detection["unchanged"].append(_short(source.name))
             else:
                 print(
                     f"  [{source.name}] CHANGED: {len(d.blocks)} block(s), "
                     f"+{d.added_lines}/-{d.removed_lines} lines."
                 )
-                notes.append(
-                    f"{source.name}: {len(d.blocks)} changed block(s) "
+                detection["changed_notes"].append(
+                    f"{_short(source.name)}: {len(d.blocks)} changed block(s) "
                     f"(+{d.added_lines}/-{d.removed_lines} lines)."
                 )
                 blocks = d.blocks[:_MAX_CHANGE_FINDINGS_PER_SOURCE]
@@ -157,7 +163,9 @@ def main(argv=None) -> int:
                 if len(d.blocks) > len(blocks):
                     extra = len(d.blocks) - len(blocks)
                     print(f"    …and {extra} more block(s) (not translated this run).")
-                    notes.append(f"{source.name}: {extra} additional block(s) exceeded per-source cap.")
+                    detection["changed_notes"].append(
+                        f"{_short(source.name)}: {extra} more block(s) exceeded per-source cap."
+                    )
 
         # --- event-feed source (Health) ---
         if result.items:
@@ -165,16 +173,13 @@ def main(argv=None) -> int:
             d = diff_items(old_items, result.items, revision_key="revision")
             new_ids = {e.get("id") for e in d.new_items}
             updated_ids = {e.get("id") for e in d.updated_items}
+            open_count = sum(1 for e in result.items if not e.get("resolved"))
 
             if d.is_first_run:
                 print(f"  [{source.name}] baseline snapshot created (first run).")
             print(
                 f"  [{source.name}] {len(d.new_items)} new, {len(d.updated_items)} "
-                f"updated; {sum(1 for e in result.items if not e.get('resolved'))} open."
-            )
-            notes.append(
-                f"{source.name}: {len(d.new_items)} new, {len(d.updated_items)} updated event(s); "
-                f"{sum(1 for e in result.items if not e.get('resolved'))} currently open."
+                f"updated; {open_count} open."
             )
 
             # Report every currently-open event (active exposure persists each
@@ -191,7 +196,7 @@ def main(argv=None) -> int:
                     if watchlist.region_filter_mode == "strict":
                         excluded += 1
                         continue  # excluded entirely
-                    # appendix mode: one-line NOISE-appendix entry, not translated
+                    # appendix mode: one-line appendix entry, not translated
                     appendixed += 1
                     out_of_region_events.append(e)
                     continue
@@ -221,14 +226,18 @@ def main(argv=None) -> int:
                     f"    region filter ({mode}): {in_scope} in-scope, "
                     + (f"{excluded} excluded" if excluded else f"{appendixed} → appendix")
                 )
-                notes.append(
-                    f"{source.name}: region filter [{mode}] on {watchlist.regions_used} — "
-                    f"{in_scope} in-scope; "
-                    + (
-                        f"{excluded} out-of-region event(s) excluded."
-                        if mode == "strict"
-                        else f"{appendixed} out-of-region event(s) demoted to appendix."
-                    )
+
+            detection["health"] = {
+                "open": open_count,
+                "in_scope": in_scope,
+                "out_region": appendixed + excluded,
+                "new": len(d.new_items),
+                "updated": len(d.updated_items),
+            }
+            # A new/updated in-scope event is a real change worth itemizing.
+            if d.new_items or d.updated_items:
+                detection["changed_notes"].append(
+                    f"Health events: {len(d.new_items)} new, {len(d.updated_items)} updated."
                 )
 
         store.save(result)
@@ -261,11 +270,11 @@ def main(argv=None) -> int:
     if errs:
         print(f"  ({errs} finding(s) failed translation — see memo's error section.)")
 
-    memo_text = render_memo(
+    memo_text = render_markdown(
         items,
         run_time=run_time,
-        watchlist_summary=_watchlist_summary(watchlist),
-        detection_notes=notes,
+        watchlist=watchlist,
+        detection=detection,
         out_of_region_events=out_of_region_events,
     )
     path = write_memo(memo_text, run_time, args.output)
@@ -278,15 +287,27 @@ def main(argv=None) -> int:
     print(f"  Triage: {urgent} URGENT · {review} REVIEW · {noise} NOISE")
 
     # --- Email delivery ---
-    _maybe_send_email(args, items, memo_text, out_of_region_events, path)
+    _maybe_send_email(
+        args,
+        items=items,
+        memo_text=memo_text,
+        run_time=run_time,
+        watchlist=watchlist,
+        detection=detection,
+        out_of_region_events=out_of_region_events,
+        memo_path=path,
+    )
 
     return 1 if failures else 0
 
 
-def _maybe_send_email(args, items, memo_text, out_of_region_events, memo_path) -> None:
+def _maybe_send_email(
+    args, *, items, memo_text, run_time, watchlist, detection,
+    out_of_region_events, memo_path,
+) -> None:
     """Send the memo by email if a recipient is configured. A send failure is
     reported but never fails the run — the memo is already written/artifacted."""
-    from radar.mailer import build_subject, send_memo_email  # lazy: needs `markdown`
+    from radar.mailer import build_subject, render_html, send_memo_email  # lazy: needs `markdown`
 
     email_cfg = load_email_config(args.config)
 
@@ -301,9 +322,17 @@ def _maybe_send_email(args, items, memo_text, out_of_region_events, memo_path) -
 
     subject = build_subject(items, out_of_region_events)
     try:
+        html_body = render_html(
+            items,
+            run_time=run_time,
+            watchlist=watchlist,
+            detection=detection,
+            out_of_region_events=out_of_region_events,
+        )
         send_memo_email(
             email_cfg,
             subject=subject,
+            html_body=html_body,
             memo_markdown=memo_text,
             attachment_name=memo_path.name,
         )
