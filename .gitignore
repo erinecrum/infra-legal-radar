@@ -1,0 +1,14 @@
+# Secrets — never commit the API key
+.env
+
+# Machine-local Claude Code settings (personal permission allowlist)
+.claude/settings.local.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Generated memos are build artifacts, not source. Snapshots ARE committed
+# (see README): they are the diff baseline the tool needs across runs.
+output/

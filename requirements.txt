@@ -1,0 +1,7 @@
+# Infrastructure Legal Event Radar — runtime dependencies (kept deliberately minimal)
+requests>=2.31        # HTTP fetching of public AWS pages/feeds
+beautifulsoup4>=4.12  # HTML parsing / content extraction for page-diff sources
+feedparser>=6.0       # RSS/Atom parsing for the AWS Health event feed
+PyYAML>=6.0           # optional non-confidential watchlist config
+python-dotenv>=1.0    # load ANTHROPIC_API_KEY from a local .env (never committed)
+anthropic>=0.40       # Claude API client for the translation layer

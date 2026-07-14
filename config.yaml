@@ -1,0 +1,25 @@
+# Optional, non-confidential watchlist. Every field is optional.
+#
+# If provided, the translation layer weights legal relevance toward the
+# services / regions / concerns you actually run. If this file is absent or
+# empty, the tool reports on everything it detects (no filtering).
+#
+# Nothing here is confidential: it is a coarse "what do we care about" hint,
+# not a description of your architecture. Edit freely or delete the file.
+
+# Services you rely on (used to prioritize SLA screening and terms changes).
+# Use AWS short names. Examples: EC2, S3, RDS, Lambda, DynamoDB, EKS.
+aws_services_used:
+  - EC2
+  - S3
+
+# Regions you operate in (used to prioritize operational/health events).
+regions_used:
+  - us-east-1
+  - eu-west-1
+
+# Free-form flags that raise the priority of matching events/changes.
+# Suggested flags: data_residency, hipaa, fedramp, gpu_capacity, ai_ml_terms
+heightened_concerns:
+  - data_residency
+  - gpu_capacity

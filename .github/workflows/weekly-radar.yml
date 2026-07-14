@@ -1,0 +1,62 @@
+name: Weekly Legal Radar
+
+# Runs the radar once a week, commits any new snapshots back to the repo (so the
+# next run has a diff baseline), and saves the memo as a downloadable artifact.
+#
+# Setup required once, in the GitHub repo:
+#   Settings → Secrets and variables → Actions → New repository secret
+#     Name:  ANTHROPIC_API_KEY
+#     Value: your key (sk-ant-...)
+# The key is never written to the repo; it is injected as an environment secret.
+
+on:
+  schedule:
+    # 07:00 UTC every Monday. Cron is UTC; adjust if you want a local time.
+    - cron: "0 7 * * 1"
+  # Also allow a manual run from the Actions tab (handy for the demo).
+  workflow_dispatch:
+
+# Allow the job to push the updated snapshots commit back to the branch.
+permissions:
+  contents: write
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the radar
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py
+
+      - name: Upload memo as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-radar-memo
+          path: output/*.md
+          if-no-files-found: warn
+
+      - name: Commit updated snapshots
+        # Snapshots are the diff baseline. Committing them each week is what lets
+        # the tool detect "what changed since last run" over time.
+        run: |
+          git config user.name  "legal-radar-bot"
+          git config user.email "legal-radar-bot@users.noreply.github.com"
+          git add snapshots
+          if git diff --cached --quiet; then
+            echo "No snapshot changes to commit."
+          else
+            git commit -m "chore: weekly snapshot update [skip ci]"
+            git push
+          fi
