@@ -1,5 +1,31 @@
 [
   {
+    "id": "arn:aws:health:eu-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_25DBE_2EF1D48B613",
+    "region_code": "eu-central-1",
+    "region_name": "Frankfurt",
+    "availability_zones": [
+      "euc1-az2"
+    ],
+    "service_name": "Multiple services",
+    "summary": "Elevated connectivity issues with a single Avalability zone",
+    "status_code": "1",
+    "status_label": "Informational",
+    "resolved": false,
+    "started_at": "2026-07-15T23:11:07+00:00",
+    "last_update_at": "2026-07-15T23:36:01+00:00",
+    "duration_hours": 0.4,
+    "impacted_service_count": 4,
+    "impacted_services": [
+      "Amazon ElastiCache",
+      "Amazon Elastic Compute Cloud",
+      "Amazon Managed Streaming for Apache Kafka",
+      "Amazon Relational Database Service"
+    ],
+    "url": "https://health.aws.amazon.com/health/status",
+    "first_seen": "2026-07-16T00:32:31.196284+00:00",
+    "last_seen": "2026-07-16T00:32:31.196284+00:00"
+  },
+  {
     "id": "arn:aws:health:me-south-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_E6426_01AD72B4E1E",
     "region_code": "me-south-1",
     "region_name": "Bahrain",
@@ -171,7 +197,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-07-14T18:55:50.753999+00:00"
+    "last_seen": "2026-07-16T00:32:31.196284+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -335,6 +361,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-07-14T18:55:50.753999+00:00"
+    "last_seen": "2026-07-16T00:32:31.196284+00:00"
   }
 ]
