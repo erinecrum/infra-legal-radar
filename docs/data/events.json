@@ -1,5 +1,24 @@
 [
   {
+    "id": "arn:aws:health:eu-central-1::event/DIRECTCONNECT/AWS_DIRECTCONNECT_OPERATIONAL_ISSUE/AWS_DIRECTCONNECT_OPERATIONAL_ISSUE_E23AA_ADAB9D3D11F",
+    "region_code": "eu-central-1",
+    "region_name": "Frankfurt",
+    "availability_zones": [],
+    "service_name": "AWS Direct Connect",
+    "summary": "Increased Packet loss",
+    "status_code": "1",
+    "status_label": "Informational",
+    "resolved": false,
+    "started_at": "2026-08-15T03:42:59+00:00",
+    "last_update_at": "2026-08-17T05:38:04+00:00",
+    "duration_hours": 49.9,
+    "impacted_service_count": 0,
+    "impacted_services": [],
+    "url": "https://health.aws.amazon.com/health/status",
+    "first_seen": "2026-08-17T07:51:26.253809+00:00",
+    "last_seen": "2026-08-17T07:51:26.253809+00:00"
+  },
+  {
     "id": "arn:aws:health:eu-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_25DBE_2EF1D48B613",
     "region_code": "eu-central-1",
     "region_name": "Frankfurt",
@@ -197,7 +216,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-08-10T08:25:25.383519+00:00"
+    "last_seen": "2026-08-17T07:51:26.253809+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -361,6 +380,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-08-10T08:25:25.383519+00:00"
+    "last_seen": "2026-08-17T07:51:26.253809+00:00"
   }
 ]
