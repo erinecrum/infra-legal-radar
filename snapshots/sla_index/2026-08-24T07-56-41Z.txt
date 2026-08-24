@@ -1,0 +1,204 @@
+AWS Service Level Agreements (SLAs)
+AWS commits to offer Service Level Agreements (SLAs) for all paid, generally available services.
+ANALYTICS
+Amazon Athena
+AWS Clean Rooms
+Amazon CloudSearch
+AWS Data Exchange
+Amazon Data Firehose
+Amazon DataZone
+Amazon EMR
+AWS Entity Resolution
+Amazon FinSpace
+AWS Glue
+Amazon Kinesis
+AWS Lake Formation
+Amazon Managed Service for Apache Flink
+Amazon Managed Streaming for Apache Kafka (MSK)
+Amazon Managed Workflows for Apache Airflow (MWAA)
+Amazon OpenSearch Service
+Amazon Redshift
+APPLICATION INTEGRATION
+Amazon API Gateway
+Amazon AppFlow
+AWS AppSync
+Amazon Connect Health
+Amazon EventBridge
+AWS HealthImaging
+Amazon HealthLake
+Amazon HealthOmics
+Amazon Location
+Amazon Managed Blockchain
+Amazon Messaging (SQS, SNS)
+Amazon MQ
+Amazon Simple Workflow
+AWS Step Functions
+ARTIFICIAL INTELLIGENCE
+AWS App Studio
+Amazon Bedrock
+Amazon CodeGuru
+Amazon DevOps Guru
+Amazon Forecast
+Amazon Fraud Detector
+Amazon Kendra
+Amazon Lookout for Equipment
+Amazon Lookout for Vision
+Amazon Machine Learning Language (including Comprehend, Comprehend Medical, Lex, Polly, Transcribe, Transcribe Medical & Translate)
+Amazon Monitron
+Amazon Personalize
+Amazon Q Developer
+Amazon Quick
+Amazon Rekognition
+Amazon SageMaker
+Amazon SageMaker AI
+Amazon Textract
+BUSINESS PRODUCTIVITY
+AWS Amplify Console
+AWS AppFabric
+Amazon Chime
+Amazon Chime SDK
+Amazon Connect Customer
+Amazon Connect Decisions
+AWS Supply Chain
+Amazon User Engagement (including Pinpoint, AWS End User Messaging & SES)
+AWS Wickr
+Amazon WorkDocs
+Amazon WorkLink
+Amazon WorkMail
+COMPUTE
+AWS Compute Optimizer
+Amazon ECS Anywhere
+Amazon EKS
+Amazon Elastic Compute Cloud (EC2)
+Amazon Elastic Container Registry (ECR)
+Amazon Elastic Load Balancing
+AWS Fargate and Amazon Elastic Container Service
+AWS Lambda
+Amazon Lightsail Instance and Block Storage
+Amazon Lightsail Managed Databases
+AWS Parallel Computing Service
+AWS SimSpace Weaver
+DATABASE
+Amazon Aurora
+Amazon Aurora DSQL
+Amazon DocumentDB (with MongoDB compatibility)
+Amazon DynamoDB
+Amazon ElastiCache
+Amazon Keyspaces
+Amazon MemoryDB for Redis
+Amazon Neptune
+Amazon RDS
+Amazon RDS Proxy
+Amazon SimpleDB
+Amazon Timestream
+DEVELOPER TOOLS
+AWS CodeArtifact
+AWS CodeBuild
+Amazon CodeCatalyst
+AWS CodeCommit
+AWS CodeDeploy
+AWS CodePipeline
+AWS Device Farm
+AWS Fault Injection Service
+AWS X-Ray
+END USER COMPUTING
+Amazon WorkSpaces
+Amazon WorkSpaces Applications
+Amazon WorkSpaces Thin Client
+GAME TECH
+Amazon GameLift Servers
+Amazon GameLift Streams
+INTERNET OF THINGS
+AWS IoT Core
+AWS IoT Device Defender
+AWS IoT Device Management
+AWS IoT FleetWise
+AWS IoT Greengrass
+AWS IoT SiteWise
+AWS IoT TwinMaker
+MANAGEMENT TOOLS
+AWS Billing Conductor
+AWS Budgets
+AWS CloudFormation
+AWS CloudTrail
+Amazon CloudWatch
+AWS Config
+AWS Cost Explorer API
+Amazon Managed Grafana
+Amazon Managed Service for Prometheus
+AWS Resilience Hub
+AWS Service Catalog
+AWS Systems Manager
+AWS Telco Network Builder
+MEDIA SERVICES
+AWS Deadline Cloud
+AWS Elemental MediaConnect
+AWS Elemental MediaConvert
+AWS Elemental MediaLive
+AWS Elemental MediaLive Anywhere
+AWS Elemental MediaPackage
+AWS Elemental MediaStore
+AWS Elemental MediaTailor
+Amazon Interactive Video Service
+Amazon Nimble Studio
+MIGRATION & MODERNIZATION
+AWS Application Migration Service (MGN)
+AWS Database Migration Service (DMS)
+AWS Mainframe Modernization
+AWS Migration Hub Refactor Spaces
+NETWORKING & CONTENT DELIVERY
+Amazon Application Recovery Controller
+AWS Client VPN
+Amazon CloudFront
+AWS Cloud Map
+AWS Cloud WAN
+AWS Direct Connect
+AWS Global Accelerator
+AWS Interconnect
+AWS PrivateLink
+Amazon Route 53
+Amazon Route 53 Resolver Endpoints
+AWS RTB Fabric
+AWS Site-to-Site VPN
+AWS Transit Gateway
+Amazon VPC IP Address Manager
+Amazon VPC Lattice
+Amazon VPC NAT Gateway
+Amazon VPC Traffic Mirroring
+QUANTUM
+Amazon Braket
+SATELLITE
+AWS Ground Station
+SECURITY & IDENTITY
+AWS Audit Manager
+Amazon Cloud Directory
+AWS CloudHSM
+Amazon Cognito
+Amazon Detective
+AWS Directory Service (including for Microsoft Active Directory, AD Connector & Simple AD)
+AWS Elastic Disaster Recovery (DRS)
+AWS Firewall Manager
+Amazon GuardDuty
+AWS IAM Access Analyzer
+Amazon Inspector
+AWS Key Management Service (KMS)
+Amazon Macie
+AWS Network Firewall
+AWS Payment Cryptography
+AWS Private Certificate Authority
+AWS Secrets Manager
+AWS Security Hub
+AWS Security Incident Response
+Amazon Security Lake
+AWS Shield Advanced
+AWS Verified Access
+Amazon Verified Permissions
+AWS WAF
+STORAGE
+AWS Backup
+Amazon EFS
+Amazon Elastic Block Store
+Amazon File Cache
+Amazon FSx
+AWS Hybrid Storage and Data Transfer (including Storage Gateway, DataSync & Transfer)
+Amazon S3

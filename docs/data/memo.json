@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-17T07:51:26.253809+00:00",
+  "generated_at": "2026-08-24T07:56:40.911744+00:00",
   "subject": "Infra Legal Radar: All quiet: no items need your attention this week",
   "verdict": "All quiet: no items need your attention this week",
   "severity": "quiet",
@@ -8,7 +8,7 @@
     "urgent": 0,
     "review": 0,
     "noise": 0,
-    "out_of_region": 3
+    "out_of_region": 2
   },
   "items": []
 }
