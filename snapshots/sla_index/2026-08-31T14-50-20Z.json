@@ -1,0 +1,11 @@
+{
+  "source_id": "sla_index",
+  "name": "AWS SLA Index",
+  "url": "https://aws.amazon.com/legal/service-level-agreements/",
+  "fetched_at": "2026-08-31T14:50:20.709526+00:00",
+  "kind": "sla",
+  "items": [],
+  "meta": {
+    "char_count": 4609
+  }
+}
