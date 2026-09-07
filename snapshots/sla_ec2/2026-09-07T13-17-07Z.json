@@ -1,0 +1,72 @@
+{
+  "source_id": "sla_ec2",
+  "name": "AWS EC2 SLA",
+  "url": "https://aws.amazon.com/compute/sla/",
+  "fetched_at": "2026-09-07T13:17:07.648082+00:00",
+  "kind": "sla",
+  "items": [],
+  "meta": {
+    "char_count": 7572,
+    "sla": {
+      "service": "EC2",
+      "commitment_percent": 99.99,
+      "tier_groups": [
+        {
+          "metric": "Monthly Uptime Percentage",
+          "applies_to": "For Amazon EC2 with all running instances deployed concurrently across two or more AZs in the same region (or at least two regions if there is only one AZ in a given region), AWS w",
+          "rows": [
+            {
+              "condition": "Less than 99.99% but equal to or greater than 99.0%",
+              "upper_percent": 99.99,
+              "lower_percent": 99.0,
+              "credit_percent": 10.0
+            },
+            {
+              "condition": "Less than 99.0% but equal to or greater than 95.0%",
+              "upper_percent": 99.0,
+              "lower_percent": 95.0,
+              "credit_percent": 30.0
+            },
+            {
+              "condition": "Less than 95.0%",
+              "upper_percent": 95.0,
+              "lower_percent": 0.0,
+              "credit_percent": 100.0
+            }
+          ]
+        },
+        {
+          "metric": "Instance-Level Uptime Percentage",
+          "applies_to": "For each individual Amazon EC2 instance (“Single EC2 Instance”), AWS will use commercially reasonable efforts to make the Single EC2 Instance available with an Instance-Level Uptim",
+          "rows": [
+            {
+              "condition": "Less than 99.5% but equal to or greater than 99.0%",
+              "upper_percent": 99.5,
+              "lower_percent": 99.0,
+              "credit_percent": 10.0
+            },
+            {
+              "condition": "Less than 99.0% but equal to or greater than 95.0%",
+              "upper_percent": 99.0,
+              "lower_percent": 95.0,
+              "credit_percent": 30.0
+            },
+            {
+              "condition": "Less than 95.0%",
+              "upper_percent": 95.0,
+              "lower_percent": 0.0,
+              "credit_percent": 100.0
+            }
+          ]
+        }
+      ],
+      "source_url": "https://aws.amazon.com/compute/sla/",
+      "claim_window_text": "credit request must be received by us by the end of the second billing cycle after which the incident occurred and must include the information specified below for the Region-Level SLA and Instance-Level SLA, respectively.",
+      "claim_window_rule": {
+        "type": "end_of_nth_billing_cycle_after_incident",
+        "billing_cycles_after_incident": 2,
+        "note": "Billing cycle = calendar month; deadline is end of that month."
+      }
+    }
+  }
+}

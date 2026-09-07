@@ -216,7 +216,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-08-31T14:50:20.081490+00:00"
+    "last_seen": "2026-09-07T13:17:05.981652+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -380,6 +380,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-08-31T14:50:20.081490+00:00"
+    "last_seen": "2026-09-07T13:17:05.981652+00:00"
   }
 ]
