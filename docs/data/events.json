@@ -55,13 +55,13 @@
       "mes1-az2"
     ],
     "service_name": "Multiple services",
-    "summary": "Increased Error Rates",
+    "summary": "Region Availability",
     "status_code": "3",
     "status_label": "Service disruption",
     "resolved": false,
     "started_at": "2026-03-02T05:56:27+00:00",
-    "last_update_at": "2026-04-30T07:07:11+00:00",
-    "duration_hours": 1417.2,
+    "last_update_at": "2026-09-15T10:22:28+00:00",
+    "duration_hours": 4732.4,
     "impacted_service_count": 149,
     "impacted_services": [
       "AWS Amplify",
@@ -216,7 +216,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-09-14T13:38:26.762426+00:00"
+    "last_seen": "2026-09-21T13:37:19.222215+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -228,13 +228,13 @@
       "mec1-az3"
     ],
     "service_name": "Multiple services",
-    "summary": "Increased Error Rates",
+    "summary": "Region Availability",
     "status_code": "3",
     "status_label": "Service disruption",
     "resolved": false,
     "started_at": "2026-03-01T12:51:25+00:00",
-    "last_update_at": "2026-04-30T07:25:54+00:00",
-    "duration_hours": 1434.6,
+    "last_update_at": "2026-09-15T10:27:10+00:00",
+    "duration_hours": 4749.6,
     "impacted_service_count": 140,
     "impacted_services": [
       "AWS Amplify",
@@ -380,6 +380,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-09-14T13:38:26.762426+00:00"
+    "last_seen": "2026-09-21T13:37:19.222215+00:00"
   }
 ]
