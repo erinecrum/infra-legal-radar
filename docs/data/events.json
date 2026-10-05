@@ -1,5 +1,59 @@
 [
   {
+    "id": "arn:aws:health:eu-south-2::event/INTERNETCONNECTIVITY/AWS_INTERNETCONNECTIVITY_OPERATIONAL_ISSUE/AWS_INTERNETCONNECTIVITY_OPERATIONAL_ISSUE_F4DC4_40592306093",
+    "region_code": "eu-south-2",
+    "region_name": "Spain",
+    "availability_zones": [
+      "eus2-az1"
+    ],
+    "service_name": "AWS Internet Connectivity",
+    "summary": "[RESOLVED] Elevated packet loss",
+    "status_code": "0",
+    "status_label": "Operating normally / resolved",
+    "resolved": true,
+    "started_at": "2026-10-04T16:14:56+00:00",
+    "last_update_at": "2026-10-04T18:56:53+00:00",
+    "duration_hours": 2.7,
+    "impacted_service_count": 32,
+    "impacted_services": [
+      "AWS Certificate Manager",
+      "AWS Cloud WAN",
+      "AWS CloudTrail",
+      "AWS Direct Connect",
+      "AWS Fargate",
+      "AWS Glue",
+      "AWS IoT Core",
+      "AWS IoT Device Management",
+      "AWS NAT Gateway",
+      "AWS Network Firewall",
+      "AWS Parallel Computing Service",
+      "AWS Step Functions",
+      "AWS Systems Manager",
+      "AWS Transfer Family",
+      "AWS Transit Gateway",
+      "AWS VPCE PrivateLink",
+      "AWS WAF",
+      "Amazon Athena",
+      "Amazon Cognito",
+      "Amazon DynamoDB",
+      "Amazon Elastic Compute Cloud",
+      "Amazon Elastic Container Service",
+      "Amazon Elastic File System",
+      "Amazon Elastic Kubernetes Service",
+      "Amazon Elastic Load Balancing",
+      "Amazon Elastic MapReduce",
+      "Amazon FSx",
+      "Amazon Redshift",
+      "Amazon Rekognition",
+      "Amazon SageMaker",
+      "Amazon Virtual Private Cloud",
+      "Bedrock AgentCore"
+    ],
+    "url": "https://health.aws.amazon.com/health/status",
+    "first_seen": "2026-10-05T15:33:12.298872+00:00",
+    "last_seen": "2026-10-05T15:33:12.298872+00:00"
+  },
+  {
     "id": "arn:aws:health:eu-central-1::event/DIRECTCONNECT/AWS_DIRECTCONNECT_OPERATIONAL_ISSUE/AWS_DIRECTCONNECT_OPERATIONAL_ISSUE_E23AA_ADAB9D3D11F",
     "region_code": "eu-central-1",
     "region_name": "Frankfurt",
@@ -216,7 +270,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-09-28T14:57:08.762826+00:00"
+    "last_seen": "2026-10-05T15:33:12.298872+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -380,6 +434,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-09-28T14:57:08.762826+00:00"
+    "last_seen": "2026-10-05T15:33:12.298872+00:00"
   }
 ]
