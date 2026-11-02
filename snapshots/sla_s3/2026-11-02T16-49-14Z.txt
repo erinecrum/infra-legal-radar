@@ -1,0 +1,43 @@
+Amazon S3 Service Level Agreement
+Last Updated: November 28, 2023
+This Amazon S3 Service Level Agreement (“SLA”) is a policy governing the use of Amazon S3 and applies separately to each account using Amazon S3. In the event of a conflict between the terms of this SLA and the terms of the
+AWS Customer Agreement
+or other agreement with us governing your use of our Services (the “Agreement”), the terms and conditions of this SLA apply, but only to the extent of such conflict. Capitalized terms used herein but not defined herein shall have the meanings set forth in the Agreement.
+Service Commitment
+AWS will use commercially reasonable efforts to make Amazon S3 available with a Monthly Uptime Percentage, as described below, during any monthly billing cycle (the “Service Commitment”). In the event Amazon S3 does not meet the Service Commitment, you will be eligible to receive a Service Credit as described below.
+Service Credits
+Service Credits are calculated as a percentage of the total charges paid by you for the applicable Amazon S3 storage class in the AWS Region (or, for S3 Express One Zone, the AWS Availability Zone (AZ)) affected for the billing cycle in which the Monthly Uptime Percentage fell within the ranges set forth in the table below.
+For requests to S3 Standard, S3 Express One Zone, S3 Glacier Flexible Retrieval, S3 Glacier Deep Archive, and all other requests not specified below:
+Monthly Uptime Percentage
+Service Credit Percentage
+Less than 99.9% but greater than or equal to 99.0%
+10%
+Less than 99.0% but greater than or equal to 95.0%
+25%
+Less than 95.0%
+100%
+For requests to S3 Intelligent-Tiering, S3 Standard-Infrequent Access, S3 One Zone-Infrequent Access, and S3 Glacier Instant Retrieval:
+Monthly Uptime Percentage
+Service Credit Percentage
+Less than 99.0% but greater than or equal to 98.0%
+10%
+Less than 98.0% but greater than or equal to 95.0%
+25%
+Less than 95.0%
+100%
+We will apply any Service Credits only against future payments otherwise due from you for Amazon S3. At our discretion, we may issue the Service Credit to the credit card you used to pay for the billing cycle in which Amazon S3 did not meet the Service Commitment. Service Credits will not entitle you to any refund or other payment from AWS. A Service Credit will be applicable and issued only if the credit amount for the applicable monthly billing cycle is greater than one dollar ($1 USD). Service Credits may not be transferred or applied to any other account. Unless otherwise provided in the AWS Agreement, your sole and exclusive remedy for any unavailability, non-performance, or other failure by us to provide Amazon S3 is the receipt of a Service Credit (if eligible) in accordance with the terms of this SLA.
+Credit Request and Payment Procedures
+To receive a Service Credit, you must submit a claim by
+opening a case in the AWS Support Center
+. To be eligible, the credit request must be received by us by the end of the second billing cycle after which the incident occurred and must include:
+1. the words “SLA Credit Request” in the subject line;
+2. the billing cycle and AWS region with respect to which you are claiming Service Credits together with the dates and times of each incident of non-zero Error Rates that you are claiming; and
+3. your request logs that document claimed incident(s) when Amazon S3 did not meet the Service Commitment (any confidential or sensitive information in these logs should be removed or replaced with asterisks).
+If the Monthly Uptime Percentage applicable to the month of such request is confirmed by us and is less than the applicable Service Commitment, then we will issue the Service Credit to you within one billing cycle following the month in which your request is confirmed by us. Your failure to provide the request and other information as required above will disqualify you from receiving a Service Credit.
+Amazon S3 SLA Exclusions
+The Service Commitment does not apply to any unavailability, suspension or termination of Amazon S3, or any other Amazon S3 performance issues: (i) caused by factors outside of our reasonable control, including any force majeure event or Internet access or related problems beyond the demarcation point of Amazon S3; (ii) that result from any actions or inactions of you; (iii) that result from your equipment, software or other technology; or (iv) arising from our suspension or termination of your right to use Amazon S3 in accordance with the AWS Agreement (collectively, the “Amazon S3 SLA Exclusions”). If availability is impacted by factors other than those used in our calculation of the Monthly Uptime Percentage, then we may issue a Service Credit considering such factors at our discretion.
+Definitions
+"Error Rate” means, for each request type to an Amazon S3 storage class: (i) the total number of internal server errors returned by Amazon S3 for such request type to the applicable Amazon S3 storage class as error status “InternalError” or “ServiceUnavailable” divided by (ii) the total number of requests for such request type during the applicable 5-minute interval of the monthly billing cycle. We will calculate the Error Rate for each AWS account as a percentage for each 5-minute interval in the monthly billing cycle. The calculation of the number of internal server errors will not include errors that arise directly or indirectly as a result of any of the Amazon S3 SLA Exclusions.
+“Monthly Uptime Percentage” is calculated by subtracting from 100% the average of the Error Rates from each 5-minute interval in the monthly billing cycle. If you did not make any requests in a given 5-minute interval, that interval is assumed to have a 0% Error Rate.
+A “Service Credit” is a dollar credit, calculated as set forth above, that we may credit back to an eligible Amazon S3 account.
+Previous version(s)
