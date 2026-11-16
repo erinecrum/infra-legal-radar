@@ -270,7 +270,7 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-11-09T17:09:33.494695+00:00"
+    "last_seen": "2026-11-16T16:45:20.575911+00:00"
   },
   {
     "id": "arn:aws:health:me-central-1::event/MULTIPLE_SERVICES/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE/AWS_MULTIPLE_SERVICES_OPERATIONAL_ISSUE_5E6B8_EF2498889B5",
@@ -344,6 +344,7 @@
       "AWS Private CA Connector for Active Directory",
       "AWS Private CA Connector for SCEP",
       "AWS Private Certificate Authority",
+      "AWS Quick",
       "AWS Resource Access Manager",
       "AWS Resource Explorer",
       "AWS Resource Groups",
@@ -405,7 +406,6 @@
       "Amazon Managed Workflows for Apache Airflow",
       "Amazon Neptune",
       "Amazon OpenSearch Service",
-      "Amazon Quick Suite",
       "Amazon Redshift",
       "Amazon Relational Database Service",
       "Amazon Route 53",
@@ -434,6 +434,6 @@
     ],
     "url": "https://health.aws.amazon.com/health/status",
     "first_seen": "2026-07-14T18:55:50.753999+00:00",
-    "last_seen": "2026-11-09T17:09:33.494695+00:00"
+    "last_seen": "2026-11-16T16:45:20.575911+00:00"
   }
 ]
